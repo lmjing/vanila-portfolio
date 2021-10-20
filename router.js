@@ -1,38 +1,40 @@
+"use strict";
+
 const homeTemplate = require("./src/views/home.hbs");
 const appTemplate = require("./src/views/app.hbs");
-
-const Home = homeTemplate();
-const App = appTemplate();
 
 import handleHome from './src/components/Home';
 import handleApp from './src/App';
 
-const routes = {
-    '/': Home,
-    '/app': App
+class Route {
+    constructor(template, handleClass) {
+        this.template = template();
+        this.handle = handleClass;
+    }
 }
-const handles = {
-    '/': handleHome,
-    '/app': handleApp
+
+const routes = {
+    '/': new Route(homeTemplate, handleHome),
+    '/app': new Route(appTemplate, handleApp),
 }
 
 const initRoute = (element) => {
-    changeRoute(element, routes['/'], handles['/']);
+    changeRoute(element, routes['/']);
 
     window.onpopstate = () => {
         const pathName = window.location.pathname;
-        changeRoute(element, routes[pathName], handles[pathName]);
+        changeRoute(element, routes[pathName]);
     }
 }
 
 const historyRoutePush = (element, pathName) => {
     window.history.pushState({}, pathName);
-    changeRoute(element, routes[pathName], handles[pathName]);
+    changeRoute(element, routes[pathName]);
 }
 
-const changeRoute = (element, route, handle) => {
-    element.innerHTML = route;
-    new handle(element);
+const changeRoute = (element, route) => {
+    element.innerHTML = route.template;
+    new route.handle(element);
 }
 
 export {
