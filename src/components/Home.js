@@ -1,16 +1,13 @@
 'use strict';
 
+import { historyRoutePush } from "../../router";
+
 export default class Home {
 
-    constructor() {
-        console.log('home constructor')
-    }
-
-    init() {
-        console.log(document);
-        const button = document.querySe('button');
+    constructor($target) {
+        const button = $target.querySelector('button');
         button.addEventListener('click', function () {
-            console.log('clicked!!!!');
+            historyRoutePush($target, '/app');
         });
     }
 }
