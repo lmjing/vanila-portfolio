@@ -1,15 +1,16 @@
 'use strict';
 
 export default class Home {
-    constructor({ $target }) {
-        this.section = document.createElement('section');
-        $target.appendChild(this.section);
-        this.render();
+
+    constructor() {
+        console.log('home constructor')
     }
 
-    render() {
-        const text = document.createElement('div');
-        text.innerText = "Home";
-        this.section.appendChild(text);
+    init() {
+        console.log(document);
+        const button = document.querySe('button');
+        button.addEventListener('click', function () {
+            console.log('clicked!!!!');
+        });
     }
 }
