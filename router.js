@@ -2,9 +2,11 @@
 
 const homeTemplate = require("./src/views/home.hbs");
 const appTemplate = require("./src/views/app.hbs");
+const profileTemplate = require("./src/views/profile.hbs");
 
 import handleHome from './src/components/Home';
 import handleApp from './src/App';
+import handleProfile from './src/components/Profile';
 
 class Route {
     constructor(template, handleClass) {
@@ -16,6 +18,7 @@ class Route {
 const routes = {
     '/': new Route(homeTemplate, handleHome),
     '/app': new Route(appTemplate, handleApp),
+    '/profile': new Route(profileTemplate, handleProfile)
 }
 
 const initRoute = (element) => {

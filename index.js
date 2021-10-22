@@ -2,7 +2,7 @@
 
 import { historyRoutePush, initRoute } from "./router.js";
 
-const appContent = document.getElementById('app-content');
+const appContent = document.getElementById('container');
 initRoute(appContent);
 
 window.onload = () => {
