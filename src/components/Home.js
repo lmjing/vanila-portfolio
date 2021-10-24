@@ -1,6 +1,6 @@
 'use strict';
 
-import { historyRoutePush } from "../../router";
+import { historyRoutePush } from "../../router.js";
 
 export default class Home {
 

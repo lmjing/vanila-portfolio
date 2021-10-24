@@ -1,43 +1,63 @@
 "use strict";
 
-const homeTemplate = require("./src/views/home.hbs");
-const appTemplate = require("./src/views/app.hbs");
-const profileTemplate = require("./src/views/profile.hbs");
+import handleHome from '/src/components/Home.js';
+import handleApp from '/src/App.js';
+import handleProfile from '/src/components/Profile.js';
 
-import handleHome from './src/components/Home';
-import handleApp from './src/App';
-import handleProfile from './src/components/Profile';
-
-class Route {
-    constructor(template, handleClass) {
-        this.template = template();
+class View {
+    constructor(route, handleClass) {
+        this.route = route;
         this.handle = handleClass;
     }
 }
 
-const routes = {
-    '/': new Route(homeTemplate, handleHome),
-    '/app': new Route(appTemplate, handleApp),
-    '/profile': new Route(profileTemplate, handleProfile)
+const views = {
+    '/': new View('/src/views/home.html', handleHome),
+    '/app': new View('/src/views/app.html', handleApp),
+    '/profile': new View('/src/views/profile.html', handleProfile)
 }
 
 const initRoute = (element) => {
-    changeRoute(element, routes['/']);
+    changeRoute(element, '/');
 
     window.onpopstate = () => {
-        const pathName = window.location.pathname;
-        changeRoute(element, routes[pathName]);
+        const path = window.location.pathname;
+        changeRoute(element, path);
     }
 }
 
-const historyRoutePush = (element, pathName) => {
-    window.history.pushState({}, pathName);
-    changeRoute(element, routes[pathName]);
+const historyRoutePush = (element, path) => {
+    window.history.pushState({}, path);
+    changeRoute(element, path);
 }
 
-const changeRoute = (element, route) => {
-    element.innerHTML = route.template;
-    new route.handle(element);
+const changeRoute = async (element, path) => {
+    await render(element, path);
+    activeHandler(element, path);
+}
+
+const render = async (root, path) => {
+    try {
+        const url = views[path].route;
+        if(!url) {
+            root.innerHTML = `${path} Not Found!`;
+            return;
+        }
+        
+        const res = await fetch(url);
+        root.innerHTML = await res.text();
+    } catch(e) {
+        console.log(e);
+    }
+};
+
+const activeHandler = (root, path) => {
+    try {
+        const { handle } = views[path];
+        new handle(root);
+    } catch(e) {
+        console.log(e);
+    }
 }
 
 export {
