@@ -5,42 +5,47 @@ import handleApp from '/src/App.js';
 import handleProfile from '/src/components/Profile.js';
 
 class View {
-    constructor(route, handleClass) {
-        this.route = route;
+    constructor(tmpltUrl, handleClass) {
+        this.tmpltUrl = tmpltUrl;
         this.handle = handleClass;
     }
 }
 
 const views = {
-    '/': new View('/src/views/home.html', handleHome),
-    '/app': new View('/src/views/app.html', handleApp),
-    '/profile': new View('/src/views/profile.html', handleProfile)
+    '': new View('/src/views/home.html', handleHome),
+    'app': new View('/src/views/app.html', handleApp),
+    'profile': new View('/src/views/profile.html', handleProfile)
 }
 
 const initRoute = (element) => {
-    changeRoute(element, '/');
+    changeRoute(element, '');
 
-    window.onpopstate = () => {
-        const path = window.location.pathname;
-        changeRoute(element, path);
+    // 새로고침 일어난 경우
+    window.addEventListener('DOMContentLoaded', () => changeRoute(element));
+    
+    // link 눌려서 hash 변경된 경우
+    window.onhashchange = () => {
+        changeRoute(element);
     }
 }
 
-const historyRoutePush = (element, path) => {
-    window.history.pushState({}, path);
-    changeRoute(element, path);
+const historyRoutePush = (element, hash) => {
+    window.history.pushState({}, hash, `#${hash}`);
+    changeRoute(element, hash);
 }
 
-const changeRoute = async (element, path) => {
-    await render(element, path);
-    activeHandler(element, path);
+const changeRoute = async (element) => {
+    const hash = location.hash.replace('#', '');
+
+    await render(element, hash);
+    activeHandler(element, hash);
 }
 
-const render = async (root, path) => {
+const render = async (root, hash) => {
     try {
-        const url = views[path].route;
+        const url = views[hash].tmpltUrl;
         if(!url) {
-            root.innerHTML = `${path} Not Found!`;
+            root.innerHTML = `${hash} Not Found!`;
             return;
         }
         
@@ -51,9 +56,9 @@ const render = async (root, path) => {
     }
 };
 
-const activeHandler = (root, path) => {
+const activeHandler = (root, hash) => {
     try {
-        const { handle } = views[path];
+        const { handle } = views[hash];
         new handle(root);
     } catch(e) {
         console.log(e);
