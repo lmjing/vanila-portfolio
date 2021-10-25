@@ -1,13 +1,19 @@
 'use strict';
 
-import { historyRoutePush } from "../../router";
+import { historyRoutePush } from "../../router.js";
+import View from "./View.js";
 
-export default class Home {
+export default class Home extends View {
 
     constructor($target) {
-        const button = $target.querySelector('button');
+        super($target, 'home.html');
+    }
+
+    handle() {
+        const element = this.$target;
+        const button = element.querySelector('button');
         button.addEventListener('click', function () {
-            historyRoutePush($target, '/app');
+            historyRoutePush(element, 'profile');
         });
     }
 }

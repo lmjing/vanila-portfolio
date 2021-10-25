@@ -1,40 +1,33 @@
 "use strict";
 
-const homeTemplate = require("./src/views/home.hbs");
-const appTemplate = require("./src/views/app.hbs");
-
-import handleHome from './src/components/Home';
-import handleApp from './src/App';
-
-class Route {
-    constructor(template, handleClass) {
-        this.template = template();
-        this.handle = handleClass;
-    }
-}
-
-const routes = {
-    '/': new Route(homeTemplate, handleHome),
-    '/app': new Route(appTemplate, handleApp),
-}
+import routers from "./src/config/routers.js";
 
 const initRoute = (element) => {
-    changeRoute(element, routes['/']);
+    activeRoute(element, '');
 
-    window.onpopstate = () => {
-        const pathName = window.location.pathname;
-        changeRoute(element, routes[pathName]);
+    // 새로고침 일어난 경우
+    window.addEventListener('DOMContentLoaded', () => activeRoute(element));
+
+    // link 눌려서 hash 변경된 경우
+    window.onhashchange = () => activeRoute(element);
+}
+
+const historyRoutePush = async (element, hash) => {
+    window.history.pushState({}, hash, `#${hash}`);
+    activeRoute(element);
+}
+
+const activeRoute = async (element) => {
+    const hash = location.hash.replace('#', '');
+    const View = routers[hash];
+    if (!View) {
+        // TODO 아래 코드 삭제 후 Not found 페이지 이동으로 변경
+        element.innerHTML = `${hash} Not Found!`;
+        return;
     }
-}
-
-const historyRoutePush = (element, pathName) => {
-    window.history.pushState({}, pathName);
-    changeRoute(element, routes[pathName]);
-}
-
-const changeRoute = (element, route) => {
-    element.innerHTML = route.template;
-    new route.handle(element);
+    const view = new View(element);
+    await view.render();
+    view.handle();
 }
 
 export {
